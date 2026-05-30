@@ -3,6 +3,7 @@ package co.edu.uco.ordexxa.apigateway.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -37,13 +38,23 @@ public class SimpleCorsWebFilter implements WebFilter {
         var origin = request.getHeaders().getOrigin();
 
         if (origin != null && allowedOrigins.contains(origin)) {
-            var headers = response.getHeaders();
+            response.beforeCommit(() -> {
+                var headers = response.getHeaders();
 
-            headers.set("Access-Control-Allow-Origin", origin);
-            headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
-            headers.set("Access-Control-Allow-Headers", "Authorization,Content-Type,Accept,Origin,X-Requested-With");
-            headers.set("Access-Control-Expose-Headers", "Authorization,Content-Type,X-Ordexxa-WAF");
-            headers.set("Access-Control-Max-Age", "3600");
+                headers.remove(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN);
+                headers.remove(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS);
+                headers.remove(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS);
+                headers.remove(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS);
+                headers.remove(HttpHeaders.ACCESS_CONTROL_MAX_AGE);
+
+                headers.set(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                headers.set(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+                headers.set(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization,Content-Type,Accept,Origin,X-Requested-With");
+                headers.set(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Authorization,Content-Type,X-Ordexxa-WAF");
+                headers.set(HttpHeaders.ACCESS_CONTROL_MAX_AGE, "3600");
+
+                return Mono.empty();
+            });
         }
 
         if (request.getMethod() == HttpMethod.OPTIONS) {
