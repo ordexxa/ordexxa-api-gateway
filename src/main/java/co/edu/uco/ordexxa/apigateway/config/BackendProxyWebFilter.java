@@ -164,7 +164,8 @@ public class BackendProxyWebFilter implements WebFilter {
                 || normalized.equals("connection")
                 || normalized.equals("content-length")
                 || normalized.equals("transfer-encoding")
-                || normalized.equals("upgrade");
+                || normalized.equals("upgrade")
+                || normalized.equals("accept-encoding");
     }
 
     private static boolean isManagedResponseHeader(String name) {
