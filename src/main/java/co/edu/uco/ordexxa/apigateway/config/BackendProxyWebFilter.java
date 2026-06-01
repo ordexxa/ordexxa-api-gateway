@@ -44,7 +44,7 @@ public class BackendProxyWebFilter implements WebFilter {
         }
 
         var method = request.getMethod();
-        if (method == null || method == HttpMethod.OPTIONS) {
+        if (method == HttpMethod.OPTIONS) {
             return chain.filter(exchange);
         }
 
@@ -91,11 +91,9 @@ public class BackendProxyWebFilter implements WebFilter {
             }
         }));
 
-        var responseMono = shouldSendBody(method)
+        return shouldSendBody(method)
                 ? requestSpec.bodyValue(bodyBytes).exchangeToMono(response -> writeBackendResponse(exchange, response))
                 : requestSpec.exchangeToMono(response -> writeBackendResponse(exchange, response));
-
-        return responseMono;
     }
 
     private Mono<Void> writeBackendResponse(ServerWebExchange exchange, ClientResponse clientResponse) {
