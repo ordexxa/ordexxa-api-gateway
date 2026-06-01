@@ -56,7 +56,11 @@ public class BackendProxyWebFilter implements WebFilter {
 
         final var finalTargetUrl = targetUrl;
 
-        return readBody(exchange)
+        var bodyPublisher = shouldSendBody(method)
+                ? readBody(exchange)
+                : Mono.just(new byte[0]);
+
+        return bodyPublisher
                 .flatMap(bodyBytes -> forwardRequest(exchange, method, finalTargetUrl, bodyBytes))
                 .timeout(Duration.ofSeconds(60))
                 .onErrorResume(error -> writeProxyError(exchange, error));
