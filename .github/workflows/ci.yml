@@ -3,13 +3,13 @@ name: Ordexxa API Gateway CI
 on:
   push:
     branches:
-      - master
       - main
+      - master
       - develop
   pull_request:
     branches:
-      - master
       - main
+      - master
       - develop
 
 jobs:
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -30,3 +32,13 @@ jobs:
 
       - name: Compile and test
         run: ./mvnw clean verify
+
+      - name: SonarQube Cloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          ./mvnw -B org.sonarsource.scanner.maven:sonar-maven-plugin:5.7.0.6970:sonar
+          -Dsonar.projectKey=ordexxa_ordexxa-api-gateway
+          -Dsonar.organization=ordexxa
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.token=$SONAR_TOKEN
