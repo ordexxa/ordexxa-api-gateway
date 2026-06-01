@@ -41,5 +41,5 @@ jobs:
           -Dsonar.projectKey=ordexxa_ordexxa-api-gateway
           -Dsonar.organization=ordexxa
           -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.coverage.exclusions=src/main/java/**/*.java
+          -Dsonar.coverage.exclusions=**/*
           -Dsonar.token=$SONAR_TOKEN
